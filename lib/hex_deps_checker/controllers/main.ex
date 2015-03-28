@@ -9,7 +9,8 @@ defmodule HexDepsChecker.Controllers.Main do
   @headers [{"User-Agent", "HexDepsChecker (0.0.1) - slogsdon"}]
 
   def index(conn, []) do
-    render conn
+    conn
+      |> send_resp(200, "Hello World")
   end
 
   def lock(conn, loc: loc, org: org, repo: repo) do
