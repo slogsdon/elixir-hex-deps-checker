@@ -5,7 +5,7 @@ config :sugar,
 
 config :sugar, HexDepsChecker.Router,
   https_only: false,
-  http: [port: 4000],
+  http: [port: System.get_env("PORT") || 4000],
   https: false
 
 config :hex_deps_checker, HexDepsChecker.Repos.Main,
