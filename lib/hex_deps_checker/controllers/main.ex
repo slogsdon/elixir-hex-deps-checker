@@ -6,6 +6,7 @@ defmodule HexDepsChecker.Controllers.Main do
   end
 
   @badge_base "https://img.shields.io/badge/"
+  @headers [{"User-Agent", "HexDepsChecker (0.0.1) - slogsdon"}]
 
   def index(conn, []) do
     render conn
@@ -23,10 +24,14 @@ defmodule HexDepsChecker.Controllers.Main do
                  macros: [],
                  aliases: [],
                  functions: []]
-    r.body
-    |> Code.eval_string([], eval_opts)
-    |> IO.inspect
-    raw conn |> resp(200, r.body)
+    json = r.body
+      |> Code.eval_string([], eval_opts)
+      |> elem(0)
+      |> Enum.map(fn {dep, {:hex, dep, version}} ->
+        %{} |> Map.put(dep, has_update?(dep, version))
+      end)
+      |> Poison.encode!
+    raw conn |> resp(200, json)
   end
 
   def image(conn, _args) do
@@ -48,8 +53,18 @@ defmodule HexDepsChecker.Controllers.Main do
       |> Enum.join("-")
   end
 
+  def has_update?(dep, version) do
+    latest = HTTPoison.get!("https://hex.pm/api/packages/#{dep}", @headers)
+      |> Map.get(:body)
+      |> Poison.decode!
+      |> Map.get("releases")
+      |> hd
+
+    Version.compare(latest["version"], version) == :gt
+  end
+
   def get_raw(package) do
-    HTTPoison.get!("https://hex.pm/api/packages/#{package}")
+    HTTPoison.get!("https://hex.pm/api/packages/#{package}", @headers)
       |> Map.get(:body)
       |> Poison.decode!
       |> Map.get("releases")

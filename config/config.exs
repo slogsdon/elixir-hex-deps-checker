@@ -9,7 +9,5 @@ config :sugar, HexDepsChecker.Router,
   https: false
 
 config :hex_deps_checker, HexDepsChecker.Repos.Main,
-  database: "hex_deps_checker_main",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
+  adapter: Ecto.Adapters.Postgres,
+  url: {:system, "DATABASE_URL"}
