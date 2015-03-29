@@ -1,18 +1,15 @@
 defmodule HexDepsChecker.Router do
   use Sugar.Router
-  plug Sugar.Plugs.HotCodeReload
+  use HexDepsChecker.ErrorHandler
+  alias HexDepsChecker.Controllers.Main
+  alias HexDepsChecker.Controllers.Api
 
-  if Sugar.Config.get(:sugar, :show_debugger, false) do
-    plug Plug.Debugger, otp_app: :hex_deps_checker
-  end
+  plug Plug.Static, at: "/", from: :hex_deps_checker
 
-  plug Plug.Static, at: "/static", from: :hex_deps_checker
+  # Main routes
+  get "/",      Main, :index
+  get "/image", Main, :image
 
-  # Uncomment the following line for session store
-  # plug Plug.Session, store: :ets, key: "sid", secure: true, table: :session
-
-  # Define your routes here
-  get "/", HexDepsChecker.Controllers.Main, :index
-  get "/image", HexDepsChecker.Controller.Main, :image
-  get "/:loc/:org/:repo", HexDepsChecker.Controllers.Main, :lock
+  # Api routes
+  get "/api/:loc/:org/:repo", Api, :lock
 end

@@ -1,7 +1,8 @@
 use Mix.Config
 
 config :sugar,
-  router: HexDepsChecker.Router
+  router: HexDepsChecker.Router,
+  show_debugger: true
 
 config :sugar, HexDepsChecker.Router,
   https_only: false,
